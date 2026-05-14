@@ -231,11 +231,17 @@ int liveupdate_reboot(void)
 	if (!liveupdate_enabled())
 		return 0;
 
+	pr_info("kexec reboot: begin liveupdate serialization\n");
+
 	err = luo_session_serialize();
-	if (err)
+	if (err) {
+		pr_err("kexec reboot: session serialization failed: %pe\n",
+		       ERR_PTR(err));
 		return err;
+	}
 
 	luo_flb_serialize();
+	pr_info("kexec reboot: liveupdate serialization complete\n");
 
 	return 0;
 }

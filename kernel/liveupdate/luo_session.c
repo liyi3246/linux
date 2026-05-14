@@ -588,17 +588,23 @@ int luo_session_serialize(void)
 	int i = 0;
 	int err;
 
+	pr_info("serialize sessions: begin (configured=%ld)\n", sh->count);
+
 	guard(rwsem_write)(&sh->rwsem);
 	list_for_each_entry(session, &sh->list, list) {
 		err = luo_session_freeze_one(session, &sh->ser[i]);
-		if (err)
+		if (err) {
+			pr_err("serialize sessions: freeze failed at idx=%d name=%s: %pe\n",
+			       i, session->name, ERR_PTR(err));
 			goto err_undo;
+		}
 
 		strscpy(sh->ser[i].name, session->name,
 			sizeof(sh->ser[i].name));
 		i++;
 	}
 	sh->header_ser->count = sh->count;
+	pr_info("serialize sessions: done (serialized=%d)\n", i);
 
 	return 0;
 
@@ -608,7 +614,7 @@ err_undo:
 		luo_session_unfreeze_one(session, &sh->ser[i]);
 		memset(sh->ser[i].name, 0, sizeof(sh->ser[i].name));
 	}
+	pr_warn("serialize sessions: rollback complete after failure\n");
 
 	return err;
 }
-

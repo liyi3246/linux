@@ -649,6 +649,8 @@ void luo_flb_serialize(void)
 	struct liveupdate_flb *gflb;
 	int i = 0;
 
+	pr_info("serialize flb: begin (registered=%ld)\n", luo_flb_global.count);
+
 	guard(rwsem_read)(&luo_register_rwlock);
 	list_private_for_each_entry(gflb, &luo_flb_global.list, private.list) {
 		struct luo_flb_private *private = luo_flb_get_private(gflb);
@@ -663,4 +665,5 @@ void luo_flb_serialize(void)
 	}
 
 	fh->header_ser->count = i;
+	pr_info("serialize flb: done (serialized=%d)\n", i);
 }

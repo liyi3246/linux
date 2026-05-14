@@ -8,6 +8,7 @@ TEST_GEN_PROGS_EXTENDED += luo_kexec_simple
 TEST_GEN_PROGS_EXTENDED += luo_multi_session
 
 TEST_FILES += do_kexec.sh
+TEST_FILES += luo_kexec_triage.sh
 
 include ../lib.mk
 
